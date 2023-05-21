@@ -106,6 +106,24 @@ class allconService {
         });
     }
 
+
+    async logoutAllcon(access_token,account_id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                
+          
+   
+                const url = `/account/logout`
+                const { data } = await this.Api(access_token).post(url,{accountId:account_id});
+                console.log("Log out",data)
+                resolve(data);
+            } catch (error) {
+                 console.log('error', error)
+                resolve(null)
+            }
+        });
+    }
+
    
 
     
