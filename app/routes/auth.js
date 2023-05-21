@@ -10,6 +10,10 @@ const databaseContextPg = require("database-context-pg");
 const Responsedata = require('../middleware/response');
 const connectionConfig = connectionSetting.config;
 const condb = new databaseContextPg(connectionConfig);
+const allconService = require("../lib/api/Allcon");
+
+
+
 const passport = require("passport");
 passport.use(JwtSetting.jwtAuth);
 
@@ -78,13 +82,40 @@ try{
          const check_permission =  await condb.clientQuery(
             `SELECT *
             FROM identity_user WHERE 
-            usr_allkon_id = $1
+            "usr_accountId" = $1
                 ;`
             , [userDetail.accountId]);
 
 
             if(check_permission.rows.length > 0) {
 
+              allconService
+              const api_allcon = new allconService();
+              let tmpOr = {
+                accountId:userDetail.accountId
+              }
+            let all_organize =  await api_allcon.getMasterOrganize(req.body.access_token,userDetail.accountId);
+            let all_organize_crate =  await api_allcon.getMasterOrganizeCreate(req.body.access_token,tmpOr);
+            let all_organize_invite =  await api_allcon.getMasterOrganizeInvite(req.body.access_token,tmpOr);
+
+            console.log("all_organize",all_organize);
+            console.log("all_organize_crate",all_organize_crate);
+            console.log("all_organize_invite",all_organize_invite);
+    
+              const vendorList = await condb.clientQuery(
+                `SELECT *
+                FROM user_vendor LEFT JOIN vendor ON vd_id = uv_vd_id WHERE 
+                uv_usr_id = $1
+                    ;`
+                , [check_permission.rows[0].usr_id]);
+                for(let v of vendorList.rows){
+                  v.is_create = false;
+                  var checkCreate = all_organize_crate.items.filter((e)=>{return e.organizeId === v.vd_api_id});
+                  if(checkCreate.length > 0){
+                    //คนสร้าง
+                    v.is_create = true;
+                  }
+                }
               var iat = moment(new Date());
               var exp = moment(new Date()).add(1, "days");
 
@@ -104,7 +135,8 @@ try{
               let temp ={
                 status:"login success",
                 token:token,
-                user:`${check_permission.rows[0].usr_first_name}   ${check_permission.rows[0].usr_last_name}`
+                user:`${check_permission.rows[0].usr_first_name}   ${check_permission.rows[0].usr_last_name}`,
+                vendor:vendorList.rows
               }
               return response.success(temp);
             }else{
