@@ -25,8 +25,8 @@ const TokenDecode = (token) => {
 };
 const getUserIDByToken = (token) => {
   let payload = TokenDecode(token);
-  if (payload.fup && payload.sys == "c") {
-    return payload.fup;
+  if (payload.access_token_allcon && payload.refresh_token_allcon) {
+    return payload.user_id;
   }
   return null;
 };
@@ -44,29 +44,12 @@ const getCompanyIdByToken = (token) => {
   }
   return null;
 };
-const getPayload = (token) => {
+function getPayload_(token)  {
   return TokenDecode(token);
 };
 const requireJWTAuth = passport.authenticate("jwt", {
   session: false,
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -89,7 +72,7 @@ try{
 
             if(check_permission.rows.length > 0) {
 
-              allconService
+     
               const api_allcon = new allconService();
               let tmpOr = {
                 accountId:userDetail.accountId
@@ -122,7 +105,7 @@ try{
             
               const payload = {
                 access_token_allcon:req.body.access_token,
-                refresh_token:req.body.refresh_token,
+                refresh_token_allcon:req.body.refresh_token,
                 user_id:check_permission.rows[0].usr_id,
                 
                 iat: iat.unix(),
@@ -212,6 +195,6 @@ module.exports = {
   requireJWTAuth: requireJWTAuth,
   getUserIDByToken: getUserIDByToken,
   getAdminIDByToken: getAdminIDByToken,
-  getPayload: getPayload,
+  getPayload: getPayload_,
   getCompanyIdByToken: getCompanyIdByToken,
 };

@@ -6,20 +6,20 @@ var {
     v4: uuidv4
 } = require('uuid');
 // let oem_id = uuidv4();
-var configLog = dbConnect.dbConnect.dbLogConnect;
+/* var configLog = dbConnect.dbConnect.dbLogConnect; */
 class logService {
     async log(model) {
         return new Promise(((resolve, reject) => {
             (async () => {
-                var client = new Client(configLog)
-                await client.connect();
+           /*      var client = new Client(configLog) */
+   /*              await client.connect(); */
                 try {
                     // await client.query(queryLog.add, [model.id, model.date, model.activity]);
                     resolve(true);
                 } catch (e) {
                     reject(e);
                 } finally {
-                    await client.end();
+             /*        await client.end(); */
                 }
             })().catch(e => {
                 console.log(e);

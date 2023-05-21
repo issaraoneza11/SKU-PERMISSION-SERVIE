@@ -1,5 +1,16 @@
 const authRouter = require('../routes/auth');
 const ResponseLog = require("./responseLog");
+const jwt_decode = require ("jwt-decode");
+const jwt = require("jwt-simple");
+
+var JwtSetting = require("../jwtSetting");
+
+const TokenDecode = (token) => {
+    return jwt.decode(token, JwtSetting.SECRET);
+  };
+function getPayload_(token)  {
+    return TokenDecode(token);
+  };
 
 class Responsedata {
     constructor(req, res) {
@@ -12,13 +23,13 @@ class Responsedata {
         this.logService = new ResponseLog();
         this.log = this.logService.model;
         const authHeader = this.req.headers.authorization;
-        const token = authHeader && authHeader.split(' ')[1]
+        const token = authHeader;
         this.log.activity.parameter = {
             "body": this.req.body,
             "query": this.req.query,
             "params": this.req.params,
             "header": this.req.headers,
-            "payload": token ? authRouter.getPayload(token) : null
+            "payload": token ? getPayload_(token) : null
         };
         this.log.activity.path = this.req.baseUrl + this.req.path;
     }

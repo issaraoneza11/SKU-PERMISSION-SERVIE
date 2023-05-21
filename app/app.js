@@ -19,7 +19,7 @@ var authRouter = require("./routes/auth");
 var permissionRoute = require("./routes/permission");
 var oemManagementRoute = require("./routes/oemManagement");
 var userManagementRoute = require("./routes/userManagement");
-
+var organzeRoute = require("./routes/organize");
 var app = express();
 /**
  * Swagger generate route
@@ -89,6 +89,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/", indexRouter);
 app.use("/api/auth", authRouter.router);
+app.use("/api/organize", organzeRoute);
 
 app.use("/api/permission",permissionRoute);
 app.use("/api/oemManagement",oemManagementRoute);

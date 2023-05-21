@@ -10,10 +10,16 @@ const authRouter = require('../routes/auth');
 */
 module.exports = authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]
-    if (!token)
-        return res.sendStatus(401)
+    const token = authHeader;
+    /* console.log(authHeader) */
+/*     console.log(token) */
+    if (!token){
+        return res.sendStatus(401);
+    }
+    
+
     jwt.verify(token, config.jwtSecret, async (err, model) => {
+   /*      console.log("here Middle ware") */
         if (err) return res.sendStatus(403)
 
         if (!authRouter.getUserIDByToken(token)) return res.status(400).send({

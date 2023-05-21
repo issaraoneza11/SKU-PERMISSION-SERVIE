@@ -1,7 +1,7 @@
 const Axios = require('axios');
 const config = require('../../../appSettingSite');
 
-class uploadService {
+class allconService {
 
     constructor(token) {
         this.token = token;
@@ -67,10 +67,49 @@ class uploadService {
         });
     }
 
+
+    async refreshAllconToken(token, access_token,refresh_token) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let temp = {
+                    access_token:access_token,
+                    refresh_token:refresh_token,
+                    app_id:'e77267cc-eecf-4492-b21c-4358d97d38b4',
+                }
+
+                console.log(temp)
+                const url = `/oauth2/refresh-token`
+                const { data } = await this.Api(access_token).post(url,temp)
+                resolve(data);
+            } catch (error) {
+                 console.log('error', error)
+                resolve(null)
+            }
+        });
+    }
+
+
+    async changeAllConOrganize(access_token,organize_code) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                
+          
+   
+                const url = `/master/organize-change?organizecode=${organize_code}&appid=${config.APP_ID}`
+                const { data } = await this.Api(access_token).get(url);
+               /*  console.log("dataCHG",data) */
+                resolve(data);
+            } catch (error) {
+                 console.log('error', error)
+                resolve(null)
+            }
+        });
+    }
+
    
 
     
 }
 
 
-module.exports = uploadService;
+module.exports = allconService;
