@@ -1,0 +1,3 @@
+{
+    "findCompanyById":"SELECT id, name, is_use, create_date, detail, start_date, expire_date, logo, logo_path, logo_name, abbr,now()::timestamp FROM company WHERE id = $1;"
+}

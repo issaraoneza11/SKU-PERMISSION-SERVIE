@@ -1,0 +1,48 @@
+{
+    "checkMasterMenu":"SELECT mm_id, mm_name, mm_is_use, mm_is_active, mm_created_date, mm_updated_date, mm_company_id, mm_path, mm_image FROM master_menu where mm_is_use = true;",
+    "checkMenuByMmId":"SELECT mm_id, mm_name, mm_is_use, mm_is_active, mm_created_date, mm_updated_date, mm_company_id, menu_path, mm_image FROM master_menu where mm_is_use = true and mm_id = $1;",
+    "addMasterMenu":"INSERT INTO master_menu(mm_id, mm_name, mm_is_use, mm_is_active, mm_created_date, mm_updated_date, mm_company_id, menu_path, menu_image)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);",
+    "addMenu":"INSERT INTO menu(menu_id, menu_name, menu_mm_id, menu_is_use, menu_is_active, menu_created_date, menu_updated_date, menu_created_by, menu_updated_by, menu_level, menu_path, menu_image)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);",
+    "checkMenuName":"SELECT mm_id, mm_name, mm_is_use, mm_is_active, mm_created_date, mm_updated_date, mm_company_id, mm_path, mm_image FROM master_menu where mm_name = $1 and mm_is_use = true;",
+    "ckeckNameMenu":"SELECT menu_id, menu_name, menu_mm_id, menu_is_use, menu_is_active, menu_created_date, menu_updated_date, menu_created_by, menu_updated_by, menu_level, menu_path, menu_image FROM menu where menu_name = $1 and menu_is_use = true;",
+    "getMenu":"SELECT menu_id, menu_name, menu_mm_id, menu_level, menu_path, menu_image FROM menu where menu_id = $1;",
+    
+    "filterMenusLv1":"SELECT mm_id as menu_id, mm_name as menu_name, mm_company_id as menu_company_id, mm_path as menu_path, mm_image as menu_image, mm_key as menu_key, mm_sort as menu_sort FROM master_menu where ($1::text is null or mm_name LIKE '%' || $1 || '%') and ($2::uuid is null or mm_id = $2) and mm_is_use = true;",
+    "filterMenusLv2":"SELECT a.menu_id, a.menu_name, a.menu_level, a.menu_path, a.menu_image,a.menu_key, a.menu_sort, a.menu_parent ,b.mm_id as master_menu_id,b.mm_name as master_menu_name FROM menu as a left join master_menu as b on a.menu_mm_id = b.mm_id where ($1::text is null or a.menu_name LIKE '%' || $1 || '%') and ($2::uuid is null or a.menu_mm_id = $2) and a.menu_is_use = true;",
+   
+    "delMenu":"UPDATE menu SET  menu_is_use = false WHERE menu_id = $1;",
+    "checkupdate":"SELECT menu_id, menu_name, menu_mm_id, menu_is_use, menu_is_active, menu_created_date, menu_updated_date, menu_created_by, menu_updated_by, menu_level, menu_path, menu_image FROM menu where menu_id != $1 and menu_mm_id = $2 and menu_is_use = true;",
+    "checkMmMenu":"SELECT mm_id, mm_name, mm_is_use, mm_is_active, mm_created_date, mm_updated_date, mm_company_id, mm_path, mm_image FROM master_menu where mm_id = $1;",
+    "updateMasterMenu":"UPDATE master_menu SET mm_name=$2, mm_updated_date=$3,mm_path=$4, mm_image=$5 WHERE mm_id = $1;",
+    "updateMenu":"UPDATE menu SET  menu_name=$2, menu_mm_id=$3, menu_updated_date=$4, menu_updated_by=$5, menu_path=$6, menu_image=$7 WHERE menu_id = $1;",
+
+    "getCompanyByIdUser_not_use":"SELECT a.iu_id as user_id, a.iu_company_id as company_group_id,b.cg_name as company_group_name,c.company_id,c.company_name FROM identity_user as a left join company_group as b on a.iu_company_id = b.cg_id  left join company as c on b.cg_id = c.company_id where a.iu_id = $1;",
+    "getCompanyByIdUser":"SELECT a.iu_id as user_id,c.company_id,c.company_name, c.company_sort,c.company_logo, c.company_logo_path, c.company_logo_name FROM identity_user as a left join identity_company as b on a.iu_id = b.ic_iu_id left join company as c on b.ic_company_id = c.company_id where a.iu_id = $1 ",
+
+    "getPermissMenuById_not_use":"SELECT a.iu_id, a.iu_company_id as menu_company_id ,b.mm_id as menu_id, b.mm_name,c.menu_name FROM identity_user as a left join master_menu as b on a.iu_company_id = b.mm_company_id left join menu as c on c.menu_mm_id = b.mm_id where a.iu_id = $1 and b.mm_is_use = true;",
+    "getPermissMenuById":"SELECT a.pu_id as permission_id, a.pu_iu_id as user_id,b.pc_company_id as company_id,b.pc_menu_id,c.role_id ,c.role_name,d.menu_name,e.mm_name as master_menu FROM permission_user as a left join permission_company as b on a.pu_pc_id = b.pc_id left join role as c on a.pu_role_id = c.role_id left join menu as d on b.pc_menu_id = d.menu_id left join master_menu as e on d.menu_mm_id = e.mm_id where a.pu_iu_id = $1;",
+
+    "getUser":"SELECT iu_id, iu_company_group_id, iu_name, iu_sirname, iu_username, iu_email, iu_password, iu_mobile, iu_detail, iu_is_active, iu_token, iu_token_create, iu_token_expired, iu_create_date, iu_is_use, iu_user_profile, iu_user_profile_name, iu_user_profile_path FROM identity_user where iu_id = $1 and iu_is_use = true;",
+    "getMasterMenuAll":"SELECT mm_id, mm_name, mm_is_use, mm_is_active, mm_created_date, mm_updated_date, mm_company_id, mm_path, mm_image, mm_key, mm_sort FROM master_menu WHERE mm_is_use = true ;",
+    "getMenuAll":"SELECT menu_id, menu_name, menu_mm_id, menu_is_use, menu_is_active, menu_created_date, menu_updated_date, menu_created_by, menu_updated_by, menu_level, menu_path, menu_image, menu_key, menu_sort, menu_parent,menu_image FROM menu WHERE menu_is_use = true;",
+
+
+
+
+
+
+    "getUserDetailById":"SELECT * FROM identity_user WHERE iu_id = $1",
+    "getCompanyGroupById":"SELECT * FROM company_group WHERE cg_id = $1",
+    "getPermissionComByUserId":"SELECT ic_id, ic_company_id as company_id,company_name, ic_iu_id as user_id,company_is_active FROM identity_company a LEFT JOIN company b ON a.ic_company_id = b.company_id WHERE ic_iu_id = $1 AND company_is_active = true",
+    "getMenuByPermission":"SELECT pum_id, pum_ic_id, pum_menu_id, pum_role_id,menu_name,menu_image,menu_path,menu_mm_id,menu_parent,menu_sort,menu_mm_id,ic_company_id as company_id FROM permission_user_menu left join menu on pum_menu_id = menu_id left join identity_company on pum_ic_id = ic_id WHERE menu_is_use = true and pum_ic_id = $1",
+    "getMasterMenu":"SELECT * FROM master_menu WHERE mm_is_use = true ORDER BY mm_sort;",
+    "getAllComapnyGroup":"SELECT * FROM company_group WHERE cg_is_use = true",
+    "getCompanyByGroup":"SELECT * FROM company WHERE company_is_use = true AND company_cg_id = $1",
+    "getUserByCom":"SELECT ic_id, ic_company_id, ic_iu_id,iu_name,iu_sirname FROM identity_company left join identity_user on ic_iu_id = iu_id WHERE ic_company_id = $1 AND iu_is_use = true;",
+    "getRelateComUser":"SELECT * FROM identity_company WHERE ic_company_id = $1 AND ic_iu_id = $2",
+    "delPermissionMenuByRelate":"DELETE FROM permission_user_menu WHERE pum_ic_id = $1",
+    "addPermissionMenu":"INSERT INTO permission_user_menu(pum_id, pum_ic_id, pum_menu_id, pum_role_id) VALUES ($1, $2, $3, $4);",
+    "getPermissionMenuByUserCom":"SELECT * FROM permission_user_menu WHERE pum_ic_id = $1"
+    
+
+}

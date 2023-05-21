@@ -1,0 +1,7 @@
+{
+"delVehicle":"UPDATE vehicle SET vehicle_is_use= false WHERE  vehicle_id=$1;",
+"getFilterVehicle":"SELECT vehicle_id, vehicle_plate_number, vehicle_type_id, vehicle_is_use, vehicle_is_active, vehicle_created_date, vehicle_updated_date, vehicle_created_by, vehicle_updated_by, vehicle_brand, vehicle_vin, vehicle_insurance_expire_date, vehicle_detail, vehicle_main_driver_id, vehicle_sub_driver_id FROM vehicle where vehicle_is_use= true LIMIT page_number_start,page_number_end ;"
+    
+
+
+}

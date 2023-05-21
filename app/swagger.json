@@ -1,0 +1,132 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Save Yanng Project",
+        "description": "Application Programming Interface (API)"
+    },
+    "host": "localhost:65121",
+    "paths": {
+        "/api/permission/filter_menu": {
+            "post": {
+                "description": "",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "schema": {
+                            "properties": {
+                                "mater_menu_id": {
+                                    "example": "",
+                                    "type": "uuid"
+                                },
+                                "master_menu_name": {
+                                    "example": "",
+                                    "type": "string"
+                                },
+                                "menu_name": {
+                                    "example": "",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "example": [
+                                {
+                                    "mm_id": "5cd024bf-7d05-47c6-8b0f-3128b27596f0",
+                                    "mm_name": "ยานพาหนะ",
+                                    "mm_key": "vehicle",
+                                    "mm_sort": 1,
+                                    "mm_company_id": "397f87e3-12c5-4052-9366-90834684e6a0",
+                                    "menu_id": "a1074422-f579-47b3-9c1b-551b6d0e87b2",
+                                    "menu_name": "ยานพาหนะ",
+                                    "menu_parent": null,
+                                    "menu_path": null,
+                                    "menu_image": null,
+                                    "menu_level": 2,
+                                    "menu_key": "vehicle_detail",
+                                    "menu_sort": 1
+                                }
+                            ],
+                            "type": "array"
+                        }
+                    }
+                },
+                "tags": [
+                    "Permission"
+                ],
+                "security": [
+                    {
+                        "apiKey": []
+                    }
+                ]
+            }
+        },
+        "/api/permission/get_company_by_id/{iu_company_id}": {
+            "get": {
+                "description": "OK",
+                "parameters": [
+                    {
+                        "in": "params",
+                        "name": "iu_company_id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "tags": [
+                    "Permission"
+                ],
+                "security": [
+                    {
+                        "apiKey": []
+                    }
+                ]
+            }
+        },
+        "/api/permission/get_user_by_id/{iu_id}": {
+            "get": {
+                "description": "OK",
+                "parameters": [
+                    {
+                        "in": "params",
+                        "name": "iu_id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "tags": [
+                    "Permission"
+                ],
+                "security": [
+                    {
+                        "apiKey": []
+                    }
+                ]
+            }
+        }
+    },
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ]
+}
