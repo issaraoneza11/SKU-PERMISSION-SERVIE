@@ -110,7 +110,7 @@ const changeOrganize = async (req, res, next) => {
 
 
 
-const getOrganize = async (req, res, next) => {
+const getDetailOrganizeList = async (req, res, next) => {
     const response = new Responsedata(req, res);
 
     try {
@@ -125,35 +125,25 @@ const getOrganize = async (req, res, next) => {
    /*      console.log(userDetail) */
       
 
-        let newToken;
-       await authFnc.refreshToken(token,user_token).then(function(result){
-            newToken = result; // Now you can use res everywhere
-        });;
-        console.log("new",newToken)
-        
-        let all_organize_crate =  await api_allcon.getMasterOrganizeCreate(newToken.newAllconToken.access_token,{'accountId':userDetail.accountId});
-       console.log(all_organize_crate);
-        const vendorList = await condb.clientQuery(
-            `SELECT *
-            FROM user_vendor LEFT JOIN vendor ON vd_id = uv_vd_id WHERE 
-            uv_usr_id = $1
-                ;`
-            , [user_token.user_id]);
-            for(let v of vendorList.rows){
-              v.is_create = false;
-              var checkCreate = all_organize_crate.items.filter((e)=>{return e.organizeId === v.vd_api_id});
-              if(checkCreate.length > 0){
-                //คนสร้าง
-                v.is_create = true;
-              }
-            }
-
-            let temp = {
-                status:true,
-                newToken:newToken.token,
-                vendor:vendorList.rows
-            };
-        return response.success(temp);
+       
+       let arr_list = [];
+        for(let item of req.body){
+            const vendorList = await condb.clientQuery(
+                `SELECT *
+                FROM vendor WHERE 
+                vd_id = $1
+                    ;`
+                , [item.vendor_id]);
+                let ven_name = '';
+                if(vendorList.rows.length > 0){
+                    ven_name = vendorList[0].vd_name || '';
+                }
+                arr_list.push(ven_name);
+        }
+      
+       
+           
+        return response.success(arr_list);
     } catch (error) {
         return response.error([
             {
@@ -169,7 +159,7 @@ const getOrganize = async (req, res, next) => {
 
 
 router.get("/Change/:organize_id", [authenticateToken], changeOrganize);
-router.get("/getOrganize", [authenticateToken], changeOrganize);
+router.post("/getDetailOrganizeList", [authenticateToken], getDetailOrganizeList);
 
 
 
