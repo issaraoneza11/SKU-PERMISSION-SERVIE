@@ -37,6 +37,15 @@ const getAdminIDByToken = (token) => {
   }
   return null;
 };
+
+const getRoleByToken = (token) => {
+  let payload = TokenDecode(token);
+  if (payload.r) {
+    return payload.r;
+  }
+  return null;
+};
+
 const getCompanyIdByToken = (token) => {
   let payload = TokenDecode(token);
   if (payload.com && payload.sys == "c") {
@@ -197,5 +206,6 @@ module.exports = {
   getUserIDByToken: getUserIDByToken,
   getAdminIDByToken: getAdminIDByToken,
   getPayload: getPayload_,
+  getRoleByToken:getRoleByToken,
   getCompanyIdByToken: getCompanyIdByToken,
 };

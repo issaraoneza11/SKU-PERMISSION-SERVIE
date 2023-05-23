@@ -1,5 +1,6 @@
 const express = require('express');
 const authenticateToken = require('../middleware/authenticateToken');
+const authenticateTokenAdmin = require('../middleware/authenticateTokenAdmin');
 const Responsedata = require('../middleware/response');
 const authFnc = require('../middleware/authFnc');
 const jwt_decode = require ("jwt-decode");
@@ -202,9 +203,53 @@ const getDetailUserList = async (req, res, next) => {
     }
 };
 
+
+const getAllOrganize = async (req, res, next) => {
+    const response = new Responsedata(req, res);
+
+    try {
+
+        const authHeader = req.headers.authorization;
+        const token = authHeader;
+/*         console.log(token) */
+        const user_token = response.getPayloadData(token);
+   /*      console.log(user_token) */
+/*         const api_allcon = new allconService();
+        const userDetail = jwt_decode(user_token.access_token_allcon); */
+   /*      console.log(userDetail) */
+     /*    console.log('hera',req.body); */
+
+
+            const organizeList = await condb.clientQuery(
+                `SELECT *
+                FROM vendor WHERE 
+                vd_is_use = 'true'
+                    ;`
+                , []);
+          
+               
+      
+/*        console.log('arr_list',arr_list) */
+           
+        return response.success(organizeList.rows);
+    } catch (error) {
+        return response.error([
+            {
+                errorcode: 400,
+                errorDis: error.message,
+            },
+        ]);
+    }
+};
+
+
+
+
 router.get("/Change/:organize_id", [authenticateToken], changeOrganize);
 router.post("/getDetailOrganizeList", [authenticateToken], getDetailOrganizeList);
 router.post("/getDetailUserList", [authenticateToken], getDetailUserList);
+
+router.get("/getAllOrganize", [authenticateTokenAdmin], getAllOrganize);
 
 
 
