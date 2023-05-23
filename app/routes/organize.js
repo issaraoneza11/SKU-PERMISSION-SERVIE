@@ -123,11 +123,12 @@ const getDetailOrganizeList = async (req, res, next) => {
         const api_allcon = new allconService();
         const userDetail = jwt_decode(user_token.access_token_allcon);
    /*      console.log(userDetail) */
-      
+      /*   console.log('hera',req.body); */
 
        
        let arr_list = [];
         for(let item of req.body){
+       /*      console.log(item.vendor_id) */
             const vendorList = await condb.clientQuery(
                 `SELECT *
                 FROM vendor WHERE 
@@ -136,12 +137,12 @@ const getDetailOrganizeList = async (req, res, next) => {
                 , [item.vendor_id]);
                 let ven_name = '';
                 if(vendorList.rows.length > 0){
-                    ven_name = vendorList[0].vd_name || '';
+                    ven_name = vendorList.rows[0].vd_name || '';
                 }
                 arr_list.push(ven_name);
         }
       
-       
+     /*   console.log('arr_list',arr_list) */
            
         return response.success(arr_list);
     } catch (error) {
@@ -156,11 +157,54 @@ const getDetailOrganizeList = async (req, res, next) => {
 
 
 
+const getDetailUserList = async (req, res, next) => {
+    const response = new Responsedata(req, res);
 
+    try {
+
+        const authHeader = req.headers.authorization;
+        const token = authHeader;
+/*         console.log(token) */
+        const user_token = response.getPayloadData(token);
+   /*      console.log(user_token) */
+        const api_allcon = new allconService();
+        const userDetail = jwt_decode(user_token.access_token_allcon);
+   /*      console.log(userDetail) */
+        console.log('hera',req.body);
+
+       
+       let arr_list = [];
+        for(let item of req.body){
+            console.log(item.user_id)
+            const userList = await condb.clientQuery(
+                `SELECT *
+                FROM identity_user WHERE 
+                usr_id = $1
+                    ;`
+                , [item.user_id]);
+                let user_name = '';
+                if(userList.rows.length > 0){
+                    user_name = `${userList.rows[0].usr_first_name || ''}  ${userList.rows[0].usr_last_name || ''}`;
+                }
+                arr_list.push(user_name);
+        }
+      
+       console.log('arr_list',arr_list)
+           
+        return response.success(arr_list);
+    } catch (error) {
+        return response.error([
+            {
+                errorcode: 400,
+                errorDis: error.message,
+            },
+        ]);
+    }
+};
 
 router.get("/Change/:organize_id", [authenticateToken], changeOrganize);
 router.post("/getDetailOrganizeList", [authenticateToken], getDetailOrganizeList);
-
+router.post("/getDetailUserList", [authenticateToken], getDetailUserList);
 
 
 
