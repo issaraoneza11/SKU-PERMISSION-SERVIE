@@ -27,7 +27,7 @@ async function refreshToken(token,user_token){
         access_token_allcon:newAlltoken.access_token,
         refresh_token_allcon:newAlltoken.refresh_token,
         user_id:user_token.user_id,
-        
+        r:user_token.r,
         iat: iat.unix(),
         exp: exp.unix(),
         exp_date: moment(exp).format('วันที่ DD-MM-yyyy เวลา HH:mm:ss'),

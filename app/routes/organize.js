@@ -170,7 +170,7 @@ const getDetailUserList = async (req, res, next) => {
         const api_allcon = new allconService();
         const userDetail = jwt_decode(user_token.access_token_allcon);
    /*      console.log(userDetail) */
-        console.log('hera',req.body);
+     /*    console.log('hera',req.body); */
 
        
        let arr_list = [];
@@ -189,7 +189,7 @@ const getDetailUserList = async (req, res, next) => {
                 arr_list.push(user_name);
         }
       
-       console.log('arr_list',arr_list)
+/*        console.log('arr_list',arr_list) */
            
         return response.success(arr_list);
     } catch (error) {

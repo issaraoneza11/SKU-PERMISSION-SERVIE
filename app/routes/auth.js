@@ -107,7 +107,7 @@ try{
                 access_token_allcon:req.body.access_token,
                 refresh_token_allcon:req.body.refresh_token,
                 user_id:check_permission.rows[0].usr_id,
-                
+                r:check_permission.rows[0].usr_ut_id,
                 iat: iat.unix(),
                 exp: exp.unix(),
                 exp_date: moment(exp).format('วันที่ DD-MM-yyyy เวลา HH:mm:ss'),
@@ -119,6 +119,7 @@ try{
                 status:"login success",
                 token:token,
                 user:`${check_permission.rows[0].usr_first_name}   ${check_permission.rows[0].usr_last_name}`,
+     
                 vendor:vendorList.rows
               }
               return response.success(temp);
