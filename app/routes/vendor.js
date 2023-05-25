@@ -52,18 +52,12 @@ router.post(
 );
 
 
-const calSkip = (page, size) => {
-  return (page - 1) * size;
-};
-
 router.post("/filterVendor", [authenticateToken], async (req, res, next) => {
   const response = new Responsedata(req, res);
   try {
     const authHeader = req.headers.authorization;
-    const token = authHeader;
-    const user_token = response.getPayloadData();
-
     const model = req.body;
+
     let field_sort = "vd_created_date";
     let sort_type = "DESC";
     if (model.field_sort == "update_date") {
@@ -77,12 +71,12 @@ router.post("/filterVendor", [authenticateToken], async (req, res, next) => {
     let current = model.current || 1;
     let pageSize = model.pageSize || 10;
 
-    let queryStr = `SELECT vd_id, vd_api_id, vd_code, vd_name, vd_coporate_no, vd_tel, vd_country_name, vd_province_name, vd_district_name, vd_sub_district_name, vd_zipcode, vd_email, vd_address, vd_organize_name, vd_business_type_name, vd_document_id, vd_document_path, vd_is_dbd, vd_account_type, vd_kyc_status, vd_is_active, vd_is_use, vd_created_date, vd_updated_date
-    FROM vendor WHERE vd_is_use = true AND vd_name = $1 ORDER BY ${field_sort} ${sort_type}
+    let queryStr = `SELECT *
+    FROM vendor WHERE vd_is_use = true AND ($1::text is null or vd_name ILIKE '%' ||  $1 || '%') ORDER BY ${field_sort} ${sort_type}
     limit ${pageSize} offset ${calSkip(current, pageSize)} ;`;
 
-    let queryCount = `SELECT vd_id, vd_api_id, vd_code, vd_name, vd_coporate_no, vd_tel, vd_country_name, vd_province_name, vd_district_name, vd_sub_district_name, vd_zipcode, vd_email, vd_address, vd_organize_name, vd_business_type_name, vd_document_id, vd_document_path, vd_is_dbd, vd_account_type, vd_kyc_status, vd_is_active, vd_is_use, vd_created_date, vd_updated_date
-    FROM vendor WHERE vd_is_use = true AND vd_name = $1;`;
+    let queryCount = `SELECT COUNT (*)
+    FROM vendor WHERE vd_is_use = true AND ($1::text is null or vd_name ILIKE '%' ||  $1 || '%');`;
 
     const tmp = await condb.clientQuery(queryStr, [
       model.name || null,
@@ -93,12 +87,9 @@ router.post("/filterVendor", [authenticateToken], async (req, res, next) => {
     ]);
 
 
-    let letven_name_list = `SELECT vd_id, vd_api_id, vd_code, vd_name, vd_coporate_no, vd_tel, vd_country_name, vd_province_name, vd_district_name, vd_sub_district_name, vd_zipcode, vd_email, vd_address, vd_organize_name, vd_business_type_name, vd_document_id, vd_document_path, vd_is_dbd, vd_account_type, vd_kyc_status, vd_is_active, vd_is_use, vd_created_date, vd_updated_date
-    FROM vendor `;
-
     let tmpData = {
       data: tmp.rows,
-      countData: tmpCount.rows[0].count || 0,
+      countData: tmpCount.rows[0].count || 0, 
     };
 
     return response.success(tmpData);
