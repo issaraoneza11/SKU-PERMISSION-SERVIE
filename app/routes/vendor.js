@@ -23,32 +23,48 @@ const { log } = require("util");
 /* var _getUserIDByToken = authRouter.getUserIDByToken; */
 const uploadService = require("../lib/api/upload");
 
+router.post(
+  "/get_all_Vendor", [/* authenticateToken */],    
+  async (req, res, next) => {
+    const response = new Responsedata(req, res);
+    try {
+      const model = req.body;
+      const tmp = await condb.clientQuery(`SELECT * FROM vendor;`);
+      return response.success(tmp.rows);
+    } catch (error) {
+      return response.error([
+        {
+          errorcode: 400,
+          errorMessage: error.message,
+        },
+      ]);
+    }
+  }
+);
 
 
-router.get("/getVendor/:id", [/* authenticateToken */], async (req, res, next) => {
+
+router.get(
+  "/getVendor/:id",
+  [
+    /* authenticateToken */
+  ],
+  async (req, res, next) => {
     const response = new Responsedata(req, res);
     try {
       const { id } = req.params;
-  
+
       const tmp = await condb.clientQuery(
         `SELECT * FROM vendor;
             `,
-        [
-          id
-  
-        ]
-
+        [id]
       );
-  
-  
+
       /* for (let i of tmp.rows) {
           
             
       } */
-  
-     
-  
-  
+
       return response.success(tmp.rows[0]);
     } catch (error) {
       return response.error([
@@ -58,10 +74,7 @@ router.get("/getVendor/:id", [/* authenticateToken */], async (req, res, next) =
         },
       ]);
     }
-  });
-  
-
-
-
+  }
+);
 
 module.exports = router;
