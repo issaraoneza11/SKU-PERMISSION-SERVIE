@@ -52,9 +52,6 @@ router.post(
 );
 
 
-const calSkip = (page, size) => {
-  return (page - 1) * size;
-};
 
 router.post("/filterVendor", [authenticateToken], async (req, res, next) => {
   const response = new Responsedata(req, res);
