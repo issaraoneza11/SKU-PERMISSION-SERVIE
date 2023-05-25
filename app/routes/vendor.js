@@ -23,6 +23,12 @@ const { log } = require("util");
 /* var _getUserIDByToken = authRouter.getUserIDByToken; */
 const uploadService = require("../lib/api/upload");
 
+
+const calSkip = (page, size) => {
+  return (page - 1) * size;
+};
+
+
 router.post(
   "/get_all_Vendor",
   [
@@ -106,37 +112,103 @@ router.post("/filterVendor", [authenticateToken], async (req, res, next) => {
   }
 });
 
-router.get(
-  "/getVendor/:id",
-  [
-    /* authenticateToken */
-  ],
-  async (req, res, next) => {
-    const response = new Responsedata(req, res);
-    try {
-      const { id } = req.params;
+router.get("/getVendor/:id", [authenticateToken], async (req, res, next) => {
+  const response = new Responsedata(req, res);
+  try {
+    const { id } = req.params;
+
+    const tmp = await condb.clientQuery(
+      `SELECT * FROM vendor WHERE vd_id = $1;
+          `,
+      [
+        id
+
+      ]
+
+    );
+    console.log( tmp.rows[0].vd_id);
+
+
+    const user = await condb.clientQuery(
+      `SELECT * FROM user_vendor WHERE uv_vd_id = $1;
+          `,
+      [
+          tmp.rows[0].vd_id
+
+      ]
+
+    );
+
+    return response.success({
+      vd: tmp.rows[0],
+      uservd:user.rows.length
+    });
+
+   
+
+
+   
+  } catch (error) {
+    return response.error([
+      {
+        errorcode: 400,
+        errorMessage: error.message,
+      },
+    ]);
+  }
+});
+
+
+router.post("/filterVendorUser", [authenticateToken], async (req, res, next) => {
+  const response = new Responsedata(req, res);
+  try {
+
+      const authHeader = req.headers.authorization;
+      const model = req.body;
+      
+          let current = model.current || 1;
+          let pageSize = model.pageSize || 10;
+      let queryStr = `SELECT * FROM user_vendor LEFT JOIN identity_user on usr_id = uv_usr_id WHERE uv_is_use = true 
+      AND uv_vd_id =$1
+      
+      limit ${pageSize} offset ${calSkip(current, pageSize)}
+      ;`;
+     
 
       const tmp = await condb.clientQuery(
-        `SELECT * FROM vendor;
-            `,
-        [id]
+          queryStr,[
+              model.id  
+          ]
+         
       );
 
-      /* for (let i of tmp.rows) {
-          
-            
-      } */
 
-      return response.success(tmp.rows[0]);
-    } catch (error) {
+      let queryCount = `SELECT COUNT(*) FROM user_vendor LEFT JOIN identity_user on usr_id = uv_usr_id WHERE uv_is_use = true 
+      AND uv_vd_id =$1
+      
+     
+      ;`;
+     
+      const tmpCount = await condb.clientQuery(
+          queryCount,[
+              model.id
+          ]
+      );
+
+    
+          let tmpData = {
+              data:tmp.rows,
+              countData:tmpCount.rows[0].count || 0,
+          };
+      return response.success(tmpData);
+  } catch (error) {
       return response.error([
-        {
-          errorcode: 400,
-          errorMessage: error.message,
-        },
+          {
+              errorcode: 400,
+              errorMessage: error.message,
+          },
       ]);
-    }
   }
-);
+});
 
 module.exports = router;
