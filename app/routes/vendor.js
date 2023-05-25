@@ -160,7 +160,7 @@ router.post("/filterVendorUser", [authenticateToken], async (req, res, next) => 
           let current = model.current || 1;
           let pageSize = model.pageSize || 10;
       let queryStr = `SELECT * FROM user_vendor LEFT JOIN identity_user on usr_id = uv_usr_id WHERE uv_is_use = true 
-      AND uv_vd_id =$1
+      AND uv_vd_id =$1 Order by uv_created_date DESC
       
       limit ${pageSize} offset ${calSkip(current, pageSize)}
       ;`;
@@ -201,5 +201,39 @@ router.post("/filterVendorUser", [authenticateToken], async (req, res, next) => 
       ]);
   }
 });
+
+router.get("/switchUserVendor/:id/:checked", [authenticateToken], async (req, res, next) => {
+  const response = new Responsedata(req, res);
+  try {
+    const { id,checked } = req.params;
+
+   await condb.clientQuery(
+      `UPDATE user_vendor
+      SET  uv_is_active = $2
+      WHERE uv_id=$1;`,
+      [
+        id,
+        checked === 'true' ? false: true
+      ]
+
+    );
+    
+
+    return response.success(true);
+
+   
+
+
+   
+  } catch (error) {
+    return response.error([
+      {
+        errorcode: 400,
+        errorMessage: error.message,
+      },
+    ]);
+  }
+});
+
 
 module.exports = router;
