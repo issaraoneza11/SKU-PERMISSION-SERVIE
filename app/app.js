@@ -22,6 +22,7 @@ var logoutRoute = require("./routes/logout");
 var oemManagementRoute = require("./routes/oemManagement");
 var userManagementRoute = require("./routes/userManagement");
 var organzeRoute = require("./routes/organize");
+var vendorRoute = require("./routes/vendor.js");
 var app = express();
 /**
  * Swagger generate route
@@ -97,6 +98,7 @@ app.use("/api/logout", logoutRoute);
 app.use("/api/permission",permissionRoute);
 app.use("/api/oemManagement",oemManagementRoute);
 app.use("/api/userManagement",userManagementRoute);
+app.use("/api/vendor",vendorRoute);
 /** 
  * Eerror
  */
