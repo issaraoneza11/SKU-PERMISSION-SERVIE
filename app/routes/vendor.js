@@ -23,11 +23,9 @@ const { log } = require("util");
 /* var _getUserIDByToken = authRouter.getUserIDByToken; */
 const uploadService = require("../lib/api/upload");
 
-
 const calSkip = (page, size) => {
   return (page - 1) * size;
 };
-
 
 router.post(
   "/get_all_Vendor",
@@ -51,7 +49,6 @@ router.post(
   }
 );
 
-
 router.post("/filterVendor", [authenticateToken], async (req, res, next) => {
   const response = new Responsedata(req, res);
   try {
@@ -67,29 +64,31 @@ router.post("/filterVendor", [authenticateToken], async (req, res, next) => {
     if (model.sort_type == "ASC") {
       sort_type = "ASC";
     }
-
+    let filde = model.type_key;
     let current = model.current || 1;
     let pageSize = model.pageSize || 10;
+    let queryStr = [];
 
-    let queryStr = `SELECT *
+    if (filde !== "All") {
+      queryStr = `SELECT *
+    FROM vendor WHERE vd_is_use = true AND ($1::text is null or ${filde} ILIKE '%' ||  $1 || '%') ORDER BY ${field_sort} ${sort_type}
+    limit ${pageSize} offset ${calSkip(current, pageSize)} ;`;
+    } else {
+      queryStr = `SELECT *
     FROM vendor WHERE vd_is_use = true AND ($1::text is null or vd_name ILIKE '%' ||  $1 || '%') ORDER BY ${field_sort} ${sort_type}
     limit ${pageSize} offset ${calSkip(current, pageSize)} ;`;
+    }
 
     let queryCount = `SELECT COUNT (*)
     FROM vendor WHERE vd_is_use = true AND ($1::text is null or vd_name ILIKE '%' ||  $1 || '%');`;
 
-    const tmp = await condb.clientQuery(queryStr, [
-      model.name || null,
-    ]);
+    const tmp = await condb.clientQuery(queryStr, [model.name || null]);
 
-    const tmpCount = await condb.clientQuery(queryCount, [
-      model.name || null,
-    ]);
-
+    const tmpCount = await condb.clientQuery(queryCount, [model.name || null]);
 
     let tmpData = {
       data: tmp.rows,
-      countData: tmpCount.rows[0].count || 0, 
+      countData: tmpCount.rows[0].count || 0,
     };
 
     return response.success(tmpData);
@@ -111,34 +110,20 @@ router.get("/getVendor/:id", [authenticateToken], async (req, res, next) => {
     const tmp = await condb.clientQuery(
       `SELECT * FROM vendor WHERE vd_id = $1;
           `,
-      [
-        id
-
-      ]
-
+      [id]
     );
-    console.log( tmp.rows[0].vd_id);
-
+    console.log(tmp.rows[0].vd_id);
 
     const user = await condb.clientQuery(
       `SELECT * FROM user_vendor WHERE uv_vd_id = $1;
           `,
-      [
-          tmp.rows[0].vd_id
-
-      ]
-
+      [tmp.rows[0].vd_id]
     );
 
     return response.success({
       vd: tmp.rows[0],
-      uservd:user.rows.length
+      uservd: user.rows.length,
     });
-
-   
-
-
-   
   } catch (error) {
     return response.error([
       {
@@ -149,91 +134,74 @@ router.get("/getVendor/:id", [authenticateToken], async (req, res, next) => {
   }
 });
 
-
-router.post("/filterVendorUser", [authenticateToken], async (req, res, next) => {
-  const response = new Responsedata(req, res);
-  try {
-
+router.post(
+  "/filterVendorUser",
+  [authenticateToken],
+  async (req, res, next) => {
+    const response = new Responsedata(req, res);
+    try {
       const authHeader = req.headers.authorization;
       const model = req.body;
-      
-          let current = model.current || 1;
-          let pageSize = model.pageSize || 10;
+
+      let current = model.current || 1;
+      let pageSize = model.pageSize || 10;
       let queryStr = `SELECT * FROM user_vendor LEFT JOIN identity_user on usr_id = uv_usr_id WHERE uv_is_use = true 
       AND uv_vd_id =$1 Order by uv_created_date DESC
       
       limit ${pageSize} offset ${calSkip(current, pageSize)}
       ;`;
-     
 
-      const tmp = await condb.clientQuery(
-          queryStr,[
-              model.id  
-          ]
-         
-      );
-
+      const tmp = await condb.clientQuery(queryStr, [model.id]);
 
       let queryCount = `SELECT COUNT(*) FROM user_vendor LEFT JOIN identity_user on usr_id = uv_usr_id WHERE uv_is_use = true 
       AND uv_vd_id =$1
       
      
       ;`;
-     
-      const tmpCount = await condb.clientQuery(
-          queryCount,[
-              model.id
-          ]
-      );
 
-    
-          let tmpData = {
-              data:tmp.rows,
-              countData:tmpCount.rows[0].count || 0,
-          };
+      const tmpCount = await condb.clientQuery(queryCount, [model.id]);
+
+      let tmpData = {
+        data: tmp.rows,
+        countData: tmpCount.rows[0].count || 0,
+      };
       return response.success(tmpData);
-  } catch (error) {
+    } catch (error) {
       return response.error([
-          {
-              errorcode: 400,
-              errorMessage: error.message,
-          },
+        {
+          errorcode: 400,
+          errorMessage: error.message,
+        },
       ]);
+    }
   }
-});
+);
 
-router.get("/switchUserVendor/:id/:checked", [authenticateToken], async (req, res, next) => {
-  const response = new Responsedata(req, res);
-  try {
-    const { id,checked } = req.params;
+router.get(
+  "/switchUserVendor/:id/:checked",
+  [authenticateToken],
+  async (req, res, next) => {
+    const response = new Responsedata(req, res);
+    try {
+      const { id, checked } = req.params;
 
-   await condb.clientQuery(
-      `UPDATE user_vendor
+      await condb.clientQuery(
+        `UPDATE user_vendor
       SET  uv_is_active = $2
       WHERE uv_id=$1;`,
-      [
-        id,
-        checked === 'true' ? false: true
-      ]
+        [id, checked === "true" ? false : true]
+      );
 
-    );
-    
-
-    return response.success(true);
-
-   
-
-
-   
-  } catch (error) {
-    return response.error([
-      {
-        errorcode: 400,
-        errorMessage: error.message,
-      },
-    ]);
+      return response.success(true);
+    } catch (error) {
+      return response.error([
+        {
+          errorcode: 400,
+          errorMessage: error.message,
+        },
+      ]);
+    }
   }
-});
-
+);
 
 module.exports = router;
